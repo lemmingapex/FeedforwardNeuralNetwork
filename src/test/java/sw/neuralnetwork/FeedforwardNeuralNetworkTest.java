@@ -4,13 +4,22 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /*
- * @author scott, @date 4/27/15 7:35 PM
+ * @author scott
  */
 public class FeedforwardNeuralNetworkTest {
 
   @Test
-  public void testSomeLibraryMethod() {
-    FeedforwardNeuralNetwork classUnderTest = new FeedforwardNeuralNetwork();
-    assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
-    }
+  public void testTraining() {
+
+    final double[][] data = new double[][]{
+            {0,0,0,0,0},
+            {1,1,1,1,1}
+    };
+
+    FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork(data);
+    feedforwardNeuralNetwork.train(0.1);
+
+    assertEquals(0, feedforwardNeuralNetwork.classify(data[0]));
+    assertEquals(1, feedforwardNeuralNetwork.classify(data[1]));
   }
+}
