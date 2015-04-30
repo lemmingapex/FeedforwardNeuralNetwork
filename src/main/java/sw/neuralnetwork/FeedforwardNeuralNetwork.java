@@ -18,22 +18,35 @@ public class FeedforwardNeuralNetwork {
     private double[][] weightsHiddenToInput;
     private double[][] weightsOutputToHidden;
 
-    private final double[][] data;
+    private double[][] inputs;
+    private double[][] expectedOutputs;
 
-    public FeedforwardNeuralNetwork(double[][] data) {
-
-        if (data.length == 0) {
-            throw new IllegalArgumentException("data is empty.");
+    private void init(double[][] inputs, double[][] expectedOutputs) {
+        if (inputs.length == 0) {
+            throw new IllegalArgumentException("input is empty.");
         }
 
-        if (data[0].length == 0) {
-            throw new IllegalArgumentException("data is empty.");
+        if (inputs[0].length == 0) {
+            throw new IllegalArgumentException("input is empty.");
         }
 
-        this.data = data;
+        if (expectedOutputs.length == 0) {
+            throw new IllegalArgumentException("output is empty.");
+        }
 
-        inputNeurons = new double[this.data[0].length];
-        outputNeurons = new double[this.data.length];
+        if (expectedOutputs[0].length == 0) {
+            throw new IllegalArgumentException("output is empty.");
+        }
+
+        if (inputs.length != expectedOutputs.length) {
+            throw new IllegalArgumentException("input length does not match output length.");
+        }
+
+        this.inputs = inputs;
+        this.expectedOutputs = expectedOutputs;
+
+        inputNeurons = new double[inputs[0].length];
+        outputNeurons = new double[expectedOutputs.length];
 
         // TODO : what size should this be?
         hiddenNeurons = new double[Math.max(Math.max(inputNeurons.length, outputNeurons.length), 2)];
@@ -70,8 +83,7 @@ public class FeedforwardNeuralNetwork {
         double mse = 0.0;
 
         for (int i = 0; i < outputNeurons.length; i++) {
-            double input = (index == i) ? 1.0 : 0.0;
-            double e = input - outputNeurons[i];
+            double e = expectedOutputs[index][i] - outputNeurons[i];
             mse += e * e;
         }
 
@@ -123,8 +135,7 @@ public class FeedforwardNeuralNetwork {
         double[] errHidden = new double[hiddenNeurons.length];
 
         for (int i = 0; i < outputNeurons.length; i++) {
-            double input = (index == i) ? 1.0 : 0.0;
-            errOutput[i] = (input - outputNeurons[i]) * ANNMath.sigmoidDerivative(outputNeurons[i]);
+            errOutput[i] = (expectedOutputs[index][i] - outputNeurons[i]) * ANNMath.sigmoidDerivative(outputNeurons[i]);
         }
 
         for (int i = 0; i < hiddenNeurons.length; i++) {
@@ -151,16 +162,16 @@ public class FeedforwardNeuralNetwork {
         }
     }
 
-    public double train(double meanSquaredErrorThreshold) {
-
+    public double train(double[][] inputs, double[][] expectedOutputs, double meanSquaredErrorThreshold) {
+        init(inputs, expectedOutputs);
         meanSquaredErrorThreshold = Math.max(meanSquaredErrorThreshold, Double.MIN_VALUE);
 
         double mse;
         int count = 0;
         do {
             // random input
-            int dataIndex = Math.min((int) (Math.random() * data.length), data.length - 1);
-            double[] input = data[dataIndex];
+            int dataIndex = Math.min((int) (Math.random() * this.inputs.length), this.inputs.length - 1);
+            double[] input = this.inputs[dataIndex];
 
             setInputNeurons(input);
             feedForward();
@@ -172,16 +183,21 @@ public class FeedforwardNeuralNetwork {
         return mse;
     }
 
-    public double train() {
-        return train(0.0001);
+    public double train(double[][] inputs, double[][] expectedOutputs) {
+        return train(inputs, expectedOutputs, 0.0001);
     }
 
-    public int classify(double[] input) {
+
+    public double[] getOuput(double[] input) {
         setInputNeurons(input);
         feedForward();
 
+        return outputNeurons;
+    }
+
+    public int classify(double[] input) {
         int bestIndex = 0;
-        double max = outputNeurons[bestIndex];
+        double max = getOuput(input)[bestIndex];
 
         for (int i = 1; i < outputNeurons.length; i++) {
             if (outputNeurons[i] > max) {

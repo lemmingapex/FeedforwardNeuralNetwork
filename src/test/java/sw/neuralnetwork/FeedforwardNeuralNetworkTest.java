@@ -12,23 +12,29 @@ public class FeedforwardNeuralNetworkTest {
     @Test
     public void testSimpleClassification() {
 
-        final double[][] data = new double[][]{
+        final double[][] inputs = new double[][]{
                 {0, 0},
                 {1, 1}
         };
 
-        FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork(data);
-        feedforwardNeuralNetwork.train();
+        final double[][] expectedOutputs = new double[][]{
+                {1, 0},
+                {0, 1}
+        };
 
-        for (int i = 0; i < data.length; i++) {
-            assertEquals(i, feedforwardNeuralNetwork.classify(data[i]));
+        FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork();
+        feedforwardNeuralNetwork.train(inputs, expectedOutputs);
+
+        for (int i = 0; i < inputs.length; i++) {
+            assertArrayEquals(expectedOutputs[i], feedforwardNeuralNetwork.getOuput(inputs[i]), 0.1);
+            assertEquals(i, feedforwardNeuralNetwork.classify(inputs[i]));
         }
     }
 
     @Test
     public void testSimpleClassification1() {
 
-        final double[][] data = new double[][]{
+        final double[][] inputs = new double[][]{
                 {0, 1, 1, 1, 0, // 0
                         1, 0, 0, 0, 1,
                         1, 0, 0, 0, 1,
@@ -101,11 +107,55 @@ public class FeedforwardNeuralNetworkTest {
                         0, 1, 1, 0, 0}
         };
 
-        FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork(data);
-        feedforwardNeuralNetwork.train();
+        final double[][] expectedOutputs = new double[][]{
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 1, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+        };
 
-        for (int i = 0; i < data.length; i++) {
-            assertEquals(i, feedforwardNeuralNetwork.classify(data[i]));
+        FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork();
+        feedforwardNeuralNetwork.train(inputs, expectedOutputs);
+
+        for (int i = 0; i < inputs.length; i++) {
+            assertArrayEquals(expectedOutputs[i], feedforwardNeuralNetwork.getOuput(inputs[i]), 0.2);
+            assertEquals(i, feedforwardNeuralNetwork.classify(inputs[i]));
         }
     }
+
+    // it is impossible for a single-layer perceptron network to learn an XOR function.
+    /*
+    @Test
+    public void testXOR() {
+
+        final double[][] inputs = new double[][]{
+                {0, 0},
+                {0, 1},
+                {1, 0},
+                {1, 1}
+        };
+
+        final double[][] expectedOutputs = new double[][]{
+                {0, 0, 0, 0},
+                {1, 1, 1, 1},
+                {1, 1, 1, 1},
+                {0, 0, 0, 0}
+        };
+
+        FeedforwardNeuralNetwork feedforwardNeuralNetwork = new FeedforwardNeuralNetwork();
+        feedforwardNeuralNetwork.train(inputs, expectedOutputs);
+
+        for (int i = 0; i < inputs.length; i++) {
+            assertArrayEquals(expectedOutputs[i], feedforwardNeuralNetwork.getOuput(inputs[i]), 0.1);
+            assertEquals(i, feedforwardNeuralNetwork.classify(inputs[i]));
+        }
+    }
+    */
+
 }
