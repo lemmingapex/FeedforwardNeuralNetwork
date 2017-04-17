@@ -2,6 +2,6 @@
 Models a [feedforward artificial neural network](http://en.wikipedia.org/wiki/Feedforward_neural_network)
 
 
-##Compile It
+## Compile It
 
 ./gradlew build
